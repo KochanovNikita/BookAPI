@@ -6,5 +6,6 @@
         public string Name { get; set; }
         public DateTime Birthday { get; set; }  
         public DateTime DieDate { get; set; }
+        public ICollection<Pseudonym> Pseudonyms { get; set; }
     }
 }
