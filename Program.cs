@@ -1,3 +1,7 @@
+using BookAPI;
+
+ApplicationContext db = new ApplicationContext();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

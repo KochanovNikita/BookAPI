@@ -11,7 +11,7 @@ namespace BookAPI
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Pseudonym> Pseudonyms { get; set; }
 
-        ApplicationContext() { Database.EnsureCreated(); }
+        public ApplicationContext() { Database.EnsureCreated(); }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
