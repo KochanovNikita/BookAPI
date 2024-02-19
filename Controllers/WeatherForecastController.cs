@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookAPI.Controllers
-{
+{/// <summary>
+/// connect db to the file
+///
+/// </summary>
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
