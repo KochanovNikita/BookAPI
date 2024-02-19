@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookAPI.Controllers
 {/// <summary>
-/// подключи сюда бд
+/// connect db to the file
 ///
 /// </summary>
     [ApiController]
