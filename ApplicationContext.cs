@@ -6,6 +6,11 @@ namespace BookAPI
 {
     public class ApplicationContext: DbContext
     {
+        public ApplicationContext(DbContextOptions<ApplicationContext> options)
+        : base(options)
+        {
+        }
+
         public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<Publisher> Publishers { get; set; }
