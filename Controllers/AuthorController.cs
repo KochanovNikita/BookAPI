@@ -1,12 +1,16 @@
 ﻿using BookAPI.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Eventing.Reader;
 using System.Security.Cryptography;
+using Swashbuckle.AspNetCore.Annotations; 
 
 namespace BookAPI.Controllers
 {
     [ApiController]
-    //  [Route("[controller]")]
+    [Produces("application/json")]
+    [Route("[controller]")]
     public class AuthorController : ControllerBase
     {
         private ApplicationContext _context;
@@ -19,10 +23,18 @@ namespace BookAPI.Controllers
         }
 
         [HttpPost(Name = "AddAuthors")]
-        public void Add(Author author)
+        public async Task<IActionResult> Add(Author author)
         {
-            _context.Authors.Add(author);
-            _context.SaveChanges();
+            try
+            {
+                _context.Authors.Add(author);
+                _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(Get), new { Status = "Success", Id = author.Id } );
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, $"Error adding author: {e.Message}");
+            }
         }
 
         [HttpPut(Name = "EditAuthors")]
@@ -32,14 +44,50 @@ namespace BookAPI.Controllers
             _context.SaveChanges();
         }
 
-        //[HttpPatch]
+        //POST only Author(no Books and Pseudonyms) 
+
+        /*[HttpPatch(Name = "PatchAuthors")]
+        public IActionResult Patch([FromBody] Author patchRequest)
+        {
+            var author = _context.Authors.FirstOrDefault(a => a.Id == patchRequest.Id);
+            if (author == null)
+            {
+                return FromResult(NotFound());
+            }
+            else
+            {
+                author.Name = patchRequest.Name;
+                author.Books = patchRequest.Books;
+                author.DieDate = patchRequest.DieDate;
+                author.Birthday = patchRequest.Birthday;
+                author.Pseudonyms = patchRequest.Pseudonyms;
+                await _context.SaveChangesAsync();
+                return FromResult(NoContent());
+            }
+        }*/
 
         [HttpDelete(Name = "DeleteAuthors")]
-        public void Delete(int authorId)
-        {
-            var deleteAuthor = _context.Authors.FirstOrDefault(e => e.Id == authorId); //Maybe
-            _context.Authors.Remove(deleteAuthor);
-            _context.SaveChanges();
+        public async Task<IActionResult> Delete(int id)
+        {            
+            Author? deleteAuthor = _context.Authors.FirstOrDefault(a => a.Id == id);
+            if (deleteAuthor != null)
+            {
+                try 
+                {
+                    _context.Authors.Remove(deleteAuthor);
+                    _context.SaveChangesAsync();
+                    return CreatedAtAction(nameof(Get), new { Status = "Success", Message = $"Author id {id} deleted." });
+                }
+                catch (Exception e) 
+                {
+                    return StatusCode(500, $"Error adding author: {e.Message}");
+                }
+
+            }            
+            else
+            {
+                return CreatedAtAction(nameof(Get), new { Status = "Error", Message = $"Author id {id} not found." });
+            }
         }
 
     }
