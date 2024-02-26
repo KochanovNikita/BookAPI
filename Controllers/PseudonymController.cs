@@ -1,8 +1,10 @@
 ﻿using BookAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BookAPI.Models;
+using BookAPI;
 
-namespace BookAPI.Controllers
+namespace pseudonymAPI.Controllers
 {
     [ApiController]
     [Produces("application/json")]
@@ -15,29 +17,69 @@ namespace BookAPI.Controllers
             [HttpGet(Name = "GetPseudonyms")] //Return JSON *all*
             public ActionResult<IEnumerable<Pseudonym>> Get()
             {
-                     return _context.Pseudonyms.Include(a => a.Author).ToList();
-            }        
+                try
+                {
+                    return Ok(_context.Pseudonyms.Include(a => a.Author).ToList());
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error getting pseudonyms: {ex.Message}");
+                }
+            }
 
-        [HttpPost(Name = "AddPseudonyms")]
-            public void Post(Pseudonym pseudonym)
+            [HttpPost(Name = "AddPseudonyms")]
+            public async Task<ActionResult> Add(Pseudonym pseudonym)
             {
-                _context.Pseudonyms.Add(pseudonym);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Pseudonyms.Add(pseudonym);
+                    _context.SaveChangesAsync();
+                    return CreatedAtAction(nameof(Get), new { id = pseudonym.Id }, pseudonym); //Google it
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error adding pseudonym: {ex.Message}");
+                }
             }
 
             [HttpPut(Name = "EditPseudonyms")]
-            public void Put(Pseudonym pseudonym)
+            public async Task<ActionResult> EditAsync(int id, Pseudonym updatedpseudonym)
             {
-                _context.Pseudonyms.Update(pseudonym);
-                _context.SaveChanges();
+                if (!_context.Pseudonyms.Any(b => b.Id == id))
+                {
+                    return NotFound($"No pseudonym found with ID {id}.");
+                }
+
+                _context.Entry(updatedpseudonym).State = EntityState.Modified;
+                try
+                {
+                    _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error editing pseudonym: {ex.Message}");
+                }
+                return NoContent();
             }
 
-            [HttpDelete(Name = "EditPseudonyms")]
-            public void Delete(int id)
+            [HttpDelete(Name = "DeletePseudonyms")]
+            public ActionResult Delete(int id)
             {
-                Pseudonym? deletePseudonym = _context.Pseudonyms.FirstOrDefault(p => p.Id == id);
-                _context.Pseudonyms.Remove(deletePseudonym);
-                _context.SaveChanges();
-            }        
+                Pseudonym? pseudonymToDelete = _context.Pseudonyms.FirstOrDefault(b => b.Id == id);
+                if (pseudonymToDelete == null)
+                {
+                    return NotFound($"Pseudonym with ID {id} not found.");
+                }
+                try
+                {
+                    _context.Pseudonyms.Remove(pseudonymToDelete);
+                    _context.SaveChanges();
+                    return NoContent();
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error deleting pseudonym: {ex.Message}");
+                }
+            }
     }
 }
