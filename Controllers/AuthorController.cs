@@ -35,24 +35,13 @@ namespace BookAPI.Controllers
         {
             try
             {
-                //Skip Books and Pseudonyms
-                if (author.Books != null && !author.Books.Any())
-                {
-                    author.Books = null;
-                }
-                if (author.Pseudonyms != null && !author.Pseudonyms.Any())
-                {
-                    author.Pseudonyms = null;
-                }
-
                 _context.Authors.Add(author);
-                await _context.SaveChangesAsync();
-
-                return CreatedAtAction(nameof(Get), new { Status = "Success", Id = author.Id });
+                _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(Get), new { id = author.Id }, author); //Google it
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return StatusCode(500, $"Error adding author: {e.Message}");
+                return StatusCode(500, $"Error adding book: {ex.Message}");
             }
         }
 

@@ -7,7 +7,7 @@ namespace BookAPI.Controllers
     [ApiController]
     [Produces("application/json")]
     [Route("[controller]")]
-    public class PseudonymController
+    public class PseudonymController: ControllerBase
     {                
             private ApplicationContext _context;
             public PseudonymController(ApplicationContext context) { _context = context; }
