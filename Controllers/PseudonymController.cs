@@ -1,5 +1,6 @@
 ﻿using BookAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookAPI.Controllers
 {
@@ -12,12 +13,12 @@ namespace BookAPI.Controllers
             public PseudonymController(ApplicationContext context) { _context = context; }
 
             [HttpGet(Name = "GetPseudonyms")] //Return JSON *all*
-            public List<Pseudonym> Get()
+            public ActionResult<IEnumerable<Pseudonym>> Get()
             {
-                return _context.Pseudonyms.ToList();
-            }
+                     return _context.Pseudonyms.Include(a => a.Author).ToList();
+            }        
 
-            [HttpPost(Name = "AddPseudonyms")]
+        [HttpPost(Name = "AddPseudonyms")]
             public void Post(Pseudonym pseudonym)
             {
                 _context.Pseudonyms.Add(pseudonym);
