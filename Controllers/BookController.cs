@@ -14,8 +14,8 @@ namespace BookAPI.Controllers
         public BookController(ApplicationContext context) { _context = context; }
 
         [HttpGet(Name = "GetBooks")]
-        [SwaggerOperation(Summary = "Get a list of books", Description = "Returns a list of books")]
-        [SwaggerResponse(200, "Successful operation", typeof(IEnumerable<Book>))]
+        //[SwaggerOperation(Summary = "Get a list of books", Description = "Returns a list of books")]
+        //[SwaggerResponse(200, "Successful operation", typeof(IEnumerable<Book>))]
         public ActionResult<IEnumerable<Book>> Get()
         {
             try

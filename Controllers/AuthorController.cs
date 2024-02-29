@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Eventing.Reader;
 using System.Security.Cryptography;
-using Swashbuckle.AspNetCore.Annotations; 
+using Swashbuckle.AspNetCore.Annotations;
+using System.Text.Json.Serialization;
 
 namespace BookAPI.Controllers
 {
@@ -17,23 +18,30 @@ namespace BookAPI.Controllers
         public AuthorController(ApplicationContext context) { _context = context; }
 
         [HttpGet(Name = "GetAuthors")]
-        public List<Author> Get()
+        public ActionResult<IEnumerable<Author>> Get()
         {
-            return _context.Authors.Include(p => p.Pseudonyms).Include(b => b.Books).ToList();
+            try 
+            {
+                return Ok(_context.Authors.Include(p => p.Pseudonyms).Include(b => b.Books).ToList());
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(500, ex.Message);
+            }            
         }
 
         [HttpPost(Name = "AddAuthors")]
-        public async Task<IActionResult> Add(Author author)
+        public async Task<IActionResult> Add([FromBody] Author author)
         {
             try
             {
                 _context.Authors.Add(author);
                 _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(Get), new { Status = "Success", Id = author.Id } );
+                return CreatedAtAction(nameof(Get), new { id = author.Id }, author); //Google it
             }
-            catch(Exception e)
+            catch (Exception ex)
             {
-                return StatusCode(500, $"Error adding author: {e.Message}");
+                return StatusCode(500, $"Error adding book: {ex.Message}");
             }
         }
 
